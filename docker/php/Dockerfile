@@ -2,6 +2,7 @@ FROM php:7.2-fpm
 
 MAINTAINER Eder Soares
 
+RUN apt-get clean
 RUN apt-get update -y
 
 RUN pecl install xdebug

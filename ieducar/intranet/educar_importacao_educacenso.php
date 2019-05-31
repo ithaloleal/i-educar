@@ -96,7 +96,7 @@ class indice extends clsCadastro
 
   function Editar()
   {
-
+    $this->arquivo = $_FILES['arquivo'];
 
     $obj_permissoes = new clsPermissoes();
     $obj_permissoes->permissao_cadastra(9998849, $this->pessoa_logada, 7,

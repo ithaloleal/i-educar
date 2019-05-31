@@ -1567,7 +1567,7 @@ class clsPmieducarEscola
                 $gruda = ', ';
             }
 
-            if (is_string($this->local_funcionamento)) {
+            if (is_string($this->local_funcionamento) && $this->local_funcionamento != '{}') {
                 $set .= "{$gruda}local_funcionamento = '{{$this->local_funcionamento}}'";
             } else {
                 $set .= "{$gruda}local_funcionamento = '{}'";
@@ -2127,7 +2127,7 @@ class clsPmieducarEscola
                 $gruda = ', ';
             }
 
-            if (is_string($this->codigo_lingua_indigena)) {
+            if (is_string($this->codigo_lingua_indigena) && $this->codigo_lingua_indigena != '{}') {
                 $set .= "{$gruda}codigo_lingua_indigena = '{{$this->codigo_lingua_indigena}}'";
                 $gruda = ', ';
             } elseif ($this->codigo_lingua_indigena !== false) {
