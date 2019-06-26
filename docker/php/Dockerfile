@@ -1,6 +1,6 @@
 FROM php:7.2-fpm
 
-MAINTAINER Eder Soares
+LABEL maintainer="Portabilis <contato@portabilis.com.br>"
 
 RUN apt-get clean
 RUN apt-get update -y
@@ -52,6 +52,8 @@ RUN apt-get install -y postgresql-client
 
 RUN apt-get install -y libpng-dev
 RUN docker-php-ext-install gd
+
+RUN apt-get install -y jq git
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_PROCESS_TIMEOUT 900
