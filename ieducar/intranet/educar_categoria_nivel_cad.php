@@ -42,7 +42,6 @@ class clsIndexBase extends clsBase
   public function Formular() {
     $this->SetTitulo($this->_instituicao . 'Servidores - Cadastro Categoria N&iacute;vel');
     $this->processoAp = '829';
-        $this->addEstilo('localizacaoSistema');
   }
 }
 
@@ -144,7 +143,7 @@ class indice extends clsCadastro
         }
 
         $this->mensagem = "Cadastro n&atilde;o realizado.<br>";
-        echo "<!--\nErro ao cadastrar clsPmieducarCategoriaNivel\nvalores obrigatorios\nis_numeric( $this->ref_usuario_cad ) && is_string( $this->nm_categoria_nivel )\n-->";
+
         return false;
     }
 
@@ -172,7 +171,7 @@ class indice extends clsCadastro
         }
 
         $this->mensagem = "Edi&ccedil;&atilde;o n&atilde;o realizada.<br>";
-        echo "<!--\nErro ao editar clsPmieducarCategoriaNivel\nvalores obrigatorios\nif( is_numeric( $this->cod_categoria_nivel ) && is_numeric( $this->ref_usuario_exc ) )\n-->";
+
         return false;
     }
 
@@ -199,7 +198,7 @@ class indice extends clsCadastro
         }
 
         $this->mensagem = "Exclus&atilde;o n&atilde;o realizada.<br>";
-        echo "<!--\nErro ao excluir clsPmieducarCategoriaNivel\nvalores obrigatorios\nif( is_numeric( $this->cod_categoria_nivel ) && is_numeric( $this->ref_usuario_exc ) )\n-->";
+
         return false;
     }
 }

@@ -15,7 +15,6 @@ class clsIndexBase extends clsBase
     {
         $this->SetTitulo($this->_instituicao . ' i-Educar - Turma');
         $this->processoAp = 586;
-        $this->addEstilo("localizacaoSistema");
     }
 }
 
@@ -118,65 +117,41 @@ class indice extends clsDetalhe
             $this->simpleRedirect('educar_turma_lst.php');
         }
 
-        if (class_exists('clsPmieducarTurmaTipo')) {
             $obj_ref_cod_turma_tipo = new clsPmieducarTurmaTipo(
                 $registro['ref_cod_turma_tipo']
             );
 
             $det_ref_cod_turma_tipo = $obj_ref_cod_turma_tipo->detalhe();
             $registro['ref_cod_turma_tipo'] = $det_ref_cod_turma_tipo['nm_tipo'];
-        } else {
-            $registro['ref_cod_turma_tipo'] = 'Erro na geração';
-        }
 
-        if (class_exists('clsPmieducarInfraPredioComodo')) {
             $obj_ref_cod_infra_predio_comodo = new clsPmieducarInfraPredioComodo(
                 $registro['ref_cod_infra_predio_comodo']
             );
 
             $det_ref_cod_infra_predio_comodo = $obj_ref_cod_infra_predio_comodo->detalhe();
             $registro['ref_cod_infra_predio_comodo'] = $det_ref_cod_infra_predio_comodo['nm_comodo'];
-        } else {
-            $registro['ref_cod_infra_predio_comodo'] = 'Erro na geração';
-        }
 
-        if (class_exists('clsPmieducarInstituicao')) {
             $obj_cod_instituicao = new clsPmieducarInstituicao(
                 $registro['ref_cod_instituicao']
             );
 
             $obj_cod_instituicao_det = $obj_cod_instituicao->detalhe();
             $registro['ref_cod_instituicao'] = $obj_cod_instituicao_det['nm_instituicao'];
-        } else {
-            $registro['ref_cod_instituicao'] = 'Erro na geração';
-        }
 
-        if (class_exists('clsPmieducarEscola')) {
             $this->ref_ref_cod_escola = $registro['ref_ref_cod_escola'];
             $obj_ref_cod_escola = new clsPmieducarEscola($registro['ref_ref_cod_escola']);
             $det_ref_cod_escola = $obj_ref_cod_escola->detalhe();
             $registro['ref_ref_cod_escola'] = $det_ref_cod_escola['nome'];
-        } else {
-            $registro['ref_cod_escola'] = 'Erro na geração';
-        }
 
-        if (class_exists('clsPmieducarCurso')) {
             $obj_ref_cod_curso = new clsPmieducarCurso($registro['ref_cod_curso']);
             $det_ref_cod_curso = $obj_ref_cod_curso->detalhe();
             $registro['ref_cod_curso'] = $det_ref_cod_curso['nm_curso'];
             $padrao_ano_escolar = $det_ref_cod_curso['padrao_ano_escolar'];
-        } else {
-            $registro['ref_cod_curso'] = 'Erro na geração';
-        }
 
-        if (class_exists('clsPmieducarSerie')) {
             $this->ref_ref_cod_serie = $registro['ref_ref_cod_serie'];
             $obj_ser = new clsPmieducarSerie($registro['ref_ref_cod_serie']);
             $det_ser = $obj_ser->detalhe();
             $registro['ref_ref_cod_serie'] = $det_ser['nm_serie'];
-        } else {
-            $registro['ref_ref_cod_serie'] = 'Erro na geração';
-        }
 
         $obj_permissoes = new clsPermissoes();
 
@@ -433,6 +408,9 @@ class indice extends clsDetalhe
 
             $this->array_botao[] = 'Reclassificar alunos alfabeticamente';
             $this->array_botao_url_script[] = "if(confirm(\"Deseja realmente reclassificar os alunos alfabeticamente?\\nAo utilizar esta opção para esta turma, a ordenação dos alunos no diário e em relatórios que é controlada por ordem de chegada após a data de fechamento da turma (campo Data de fechamento), passará a ter o controle novamente alfabético, desconsiderando a data de fechamento.\"))reclassifica_matriculas({$registro['cod_turma']})";
+
+            $this->array_botao[] = 'Reclassificar alunos por data base';
+            $this->array_botao_url_script[] = "if(confirm(\"Deseja realmente reclassificar os alunos por data base?\\nAo utilizar esta opção para esta turma, a ordenação dos alunos no diário e em relatórios será reordenada para verificar a existência de data base, assim como validação das matrículas de dependência, respeitando a data de enturmação das matrículas e não somente ordenação alfabética.\"))ordena_matriculas_por_data_base({$registro['cod_turma']})";
 
             $this->array_botao[] = 'Editar sequência de alunos na turma';
             $this->array_botao_url_script[] = sprintf('go("educar_ordenar_alunos_turma.php?cod_turma=%d");', $registro['cod_turma']);

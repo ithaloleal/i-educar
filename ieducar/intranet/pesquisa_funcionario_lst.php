@@ -1,29 +1,5 @@
 <?php
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    *                                                                        *
-    *   @author Prefeitura Municipal de Itajaí                               *
-    *   @updated 29/03/2007                                                  *
-    *   Pacote: i-PLB Software Público Livre e Brasileiro                    *
-    *                                                                        *
-    *   Copyright (C) 2006  PMI - Prefeitura Municipal de Itajaí             *
-    *                       ctima@itajai.sc.gov.br                           *
-    *                                                                        *
-    *   Este  programa  é  software livre, você pode redistribuí-lo e/ou     *
-    *   modificá-lo sob os termos da Licença Pública Geral GNU, conforme     *
-    *   publicada pela Free  Software  Foundation,  tanto  a versão 2 da     *
-    *   Licença   como  (a  seu  critério)  qualquer  versão  mais  nova.    *
-    *                                                                        *
-    *   Este programa  é distribuído na expectativa de ser útil, mas SEM     *
-    *   QUALQUER GARANTIA. Sem mesmo a garantia implícita de COMERCIALI-     *
-    *   ZAÇÃO  ou  de ADEQUAÇÃO A QUALQUER PROPÓSITO EM PARTICULAR. Con-     *
-    *   sulte  a  Licença  Pública  Geral  GNU para obter mais detalhes.     *
-    *                                                                        *
-    *   Você  deve  ter  recebido uma cópia da Licença Pública Geral GNU     *
-    *   junto  com  este  programa. Se não, escreva para a Free Software     *
-    *   Foundation,  Inc.,  59  Temple  Place,  Suite  330,  Boston,  MA     *
-    *   02111-1307, USA.                                                     *
-    *                                                                        *
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 /**
  * Os parâmetros passados para esta página de listagem devem estar dentro da classe clsParametrosPesquisas.inc.php
  *
@@ -109,22 +85,14 @@ class indice extends clsListagem
 
             if (!$lst_funcionario)
             {
-        // Obter lista de funcionário
-        // Mudar: Pegar por pessoa para cadastrar em vez do usuário
                 $lst_funcionario = $obj_funcionario->lista($chave_busca, false, false, false, false, false, false, $iniciolimit, $limite, false, $com_matricula);
             }
 
-            // if ( !$lst_funcionario )
-            // {
-            //  $obj_funcionario = new clsFuncionario(null, null, $chave_busca);
-      //  $det_funcionario = $obj_funcionario->detalhe();
-            //  $lst_funcionario = $obj_funcionario->lista( $det_funcionario['matricula'], false, false, false, false, false, false, $iniciolimit, $limite, false, $com_matricula );
-            // }
         } else {
             $obj_funcionario = new clsFuncionario();
             $lst_funcionario = $obj_funcionario->lista(false, false, false, false, false, false, false, $iniciolimit, $limite, false, $com_matricula);
         }
-    
+
         if ( $lst_funcionario ) {
             foreach ($lst_funcionario as $funcionario) {
         $obj_cod_servidor = new clsFuncionario($funcionario['ref_cod_pessoa_fj']);
@@ -172,8 +140,8 @@ class indice extends clsListagem
                 else
                     $funcao .= " )";
                 $this->addLinhas( array("
-                    <a href='javascript:void(0);' onclick=\"javascript:{$funcao}\">{$funcionario["matricula"]}</a>", 
-                    "<a href='javascript:void(0);' onclick=\"javascript:{$funcao}\">{$det_cod_servidor['cpf']}</a>", 
+                    <a href='javascript:void(0);' onclick=\"javascript:{$funcao}\">{$funcionario["matricula"]}</a>",
+                    "<a href='javascript:void(0);' onclick=\"javascript:{$funcao}\">{$det_cod_servidor['cpf']}</a>",
                     "<a href='javascript:void(0);' onclick=\"javascript:{$funcao}\">{$funcionario["nome"]}</a>" ) );
                 $total = $funcionario['_total'];
 

@@ -29,6 +29,9 @@
  * @version   $Id$
  */
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 require_once 'include/clsBase.inc.php';
 require_once 'include/clsCadastro.inc.php';
 
@@ -46,7 +49,6 @@ class clsIndexBase extends clsBase
   {
     $this->SetTitulo($this->_instituicao . ' i-Educar - Exporta&ccedil;&atilde;o Educacenso');
     $this->processoAp = ($_REQUEST['fase2'] == 1 ? 9998845 : 846);
-    $this->addEstilo('localizacaoSistema');
   }
 }
 
@@ -84,9 +86,13 @@ class indice extends clsCadastro
     if ($exportacao) {
       $converted_to_iso88591 = utf8_decode($exportacao);
 
+      $inepEscola = DB::selectOne('SELECT cod_escola_inep FROM modules.educacenso_cod_escola WHERE cod_escola = ?', [$_POST["escola"]]);
+
+      $nomeArquivo = $inepEscola->cod_escola_inep . '_' . date('dm_Hi') . '.txt';
+
       header('Content-type: text/plain');
       header('Content-Length: ' . strlen($converted_to_iso88591));
-      header('Content-Disposition: attachment; filename=exportacao.txt');
+      header('Content-Disposition: attachment; filename=' . $nomeArquivo);
       echo $converted_to_iso88591;
       die();
     }
@@ -107,7 +113,7 @@ class indice extends clsCadastro
       $this->campoOculto("fase2", "true");
     }
 
-    $this->campoOculto("enable_export", (int)$GLOBALS['coreExt']['Config']->educacenso->enable_export);
+    $this->campoOculto("enable_export", (int) config('legacy.educacenso.enable_export'));
     $this->inputsHelper()->dynamic(array('ano', 'instituicao', 'escola'));
     $this->inputsHelper()->hidden('escola_em_andamento', [ 'value' => $this->escola_em_andamento ]);
 

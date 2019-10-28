@@ -197,7 +197,15 @@ var newSubmitForm = function (event) {
     }
 
     if ($j('#deficiencias').val().length > 1) {
-        if ($j('#url_laudo_medico_obrigatorio').length > 0 && $j('#url_laudo_medico').val().length < 1) {
+
+        let laudos = $j('#url_laudo_medico').val();
+        let temLaudos = false;
+
+        if (laudos.length > 0) {
+          temLaudos = JSON.parse(laudos).length > 0;
+        }
+
+        if ($j('#url_laudo_medico_obrigatorio').length > 0 && !temLaudos) {
             return laudoMedicoObrigatorio();
         }
     }
@@ -212,8 +220,8 @@ var newSubmitForm = function (event) {
     }
 
     // Valida se o tamanho do campo aluno_estado_id é igual à 13
-    if ($j('#aluno_estado_id').val() !== '' && $j('#aluno_estado_id').val().length !== 13) {
-        messageUtils.error('O campo Código rede estadual (RA) deve conter exatos 13 dígitos.');
+    if ($j('#aluno_estado_id').val() !== '' && ! (($j('#aluno_estado_id').val().length === 13) || ($j('#aluno_estado_id').val().length === 11))) {
+        messageUtils.error('O campo Código rede estadual (RA) deve conter exatos 13 ou 11 dígitos.');
         return false;
     }
 
@@ -1732,7 +1740,7 @@ function canShowParentsFields() {
         `);
 
         $j('body').append(`
-          <div id="dialog-recursos-prova-inep" style="font-size: 85%;">
+          <div id="dialog-recursos-prova-inep" style="font-size: 85%; z-index: 9999;">
           <ul style="padding-right: 30px;">
             <li>Dentre as opções: Prova Ampliada (Fonte 18), Prova superampliada (Fonte 24) ou Material didático e Prova em Braille, apenas uma deve ser informada;</li>
             <li><b>Auxílio ledor</b>: pode ser informado quando o(a) aluno(a) possuir a(s) deficiência(s): Cegueira, Baixa visão, Surdocegueira, Deficiência física, Deficiência intelectual e Transtorno do espectro autista. <b>Exceto</b> se possuir também Surdez;</li>
@@ -1772,6 +1780,12 @@ function canShowParentsFields() {
             "Fechar": function () {
               $j(this).dialog("close");
             }
+          },
+          open: function (event, ui) {
+            $j('#dialog-recursos-prova-inep')
+              .parent('.ui-dialog').css('z-index', 99998);
+
+            $j('.ui-widget-overlay').css('z-index', 99997);
           }
         });
         $j('body').on('click', '.open-dialog-recursos-prova-inep', () => {
@@ -2576,7 +2590,7 @@ if ($j('#transporte_rota').length > 0) {
       $j('#data_emissao_rg').makeUnrequired();
       $j('#orgao_emissao_rg').makeUnrequired();
       $j('#uf_emissao_rg').makeUnrequired();
-      if ($j('#rg').val().length && obrigarCamposCenso) {
+      if ($j('#rg').val().trim().length && obrigarCamposCenso) {
         $j('#data_emissao_rg').makeRequired();
         $j('#orgao_emissao_rg').makeRequired();
         $j('#uf_emissao_rg').makeRequired();

@@ -19,7 +19,6 @@ class clsIndexBase extends clsBase
         $this->SetTitulo($this->_instituicao . ' i-Educar - Calendários');
         $this->addScript('calendario');
         $this->processoAp = 620;
-        $this->addEstilo("localizacaoSistema");
     }
 }
 
@@ -88,10 +87,6 @@ class indice extends clsListagem
           foreach (Session::get('calendario') as $var => $val) {
               $this->$var = ($val === '') ? null : $val;
           }
-      }
-
-      if ($_GET) {
-          $this->simpleRedirect('educar_calendario_ano_letivo_lst.php');
       }
 
       if (!$this->mes) {

@@ -1,11 +1,12 @@
 <?php
 
+use iEducar\Legacy\Model;
 use Illuminate\Support\Facades\Session;
 
 require_once 'include/pmieducar/geral.inc.php';
 require_once 'include/modules/clsModulesAuditoriaGeral.inc.php';
 
-class clsPmieducarMatricula
+class clsPmieducarMatricula extends Model
 {
     public $cod_matricula;
     public $ref_cod_reserva_vaga;
@@ -44,73 +45,12 @@ class clsPmieducarMatricula
     public $matricula_transferencia;
 
     /**
-     * Armazena o total de resultados obtidos na última chamada ao método lista().
-     *
-     * @var int
-     */
-    public $_total;
-
-    /**
-     * Nome do schema.
-     *
-     * @var string
-     */
-    public $_schema;
-
-    /**
-     * Nome da tabela.
-     *
-     * @var string
-     */
-    public $_tabela;
-
-    /**
-     * Lista separada por vírgula, com os campos que devem ser selecionados na
-     * próxima chamado ao método lista().
-     *
-     * @var string
-     */
-    public $_campos_lista;
-
-    /**
-     * Lista com todos os campos da tabela separados por vírgula, padrão para
-     * seleção no método lista.
-     *
-     * @var string
-     */
-    public $_todos_campos;
-
-    /**
-     * Valor que define a quantidade de registros a ser retornada pelo método lista().
-     *
-     * @var int
-     */
-    public $_limite_quantidade;
-
-    /**
-     * Define o valor de offset no retorno dos registros no método lista().
-     *
-     * @var int
-     */
-    public $_limite_offset;
-
-    /**
-     * Define o campo para ser usado como padrão de ordenação no método lista().
-     *
-     * @var string
-     */
-    public $_campo_order_by;
-
-    /**
      * Instância do objeto de clsBanco.
      *
      * @var clsBanco
      */
     protected $db;
 
-    /**
-     * Construtor.
-     */
     public function __construct(
         $cod_matricula = null,
         $ref_cod_reserva_vaga = null,
@@ -146,103 +86,23 @@ class clsPmieducarMatricula
         $this->_campos_lista = $this->_todos_campos = 'm.cod_matricula, m.ref_cod_reserva_vaga, m.ref_ref_cod_escola, m.ref_ref_cod_serie, m.ref_usuario_exc, m.ref_usuario_cad, m.ref_cod_aluno, m.aprovado, m.data_cadastro, m.data_exclusao, m.ativo, m.ano, m.ultima_matricula, m.modulo,formando,descricao_reclassificacao,matricula_reclassificacao, m.ref_cod_curso,m.matricula_transferencia,m.semestre, m.data_matricula, m.data_cancel, m.ref_cod_abandono_tipo, m.turno_pre_matricula, m.dependencia, data_saida_escola';
 
         if (is_numeric($ref_usuario_exc)) {
-            if (class_exists('clsPmieducarUsuario')) {
-                $tmp_obj = new clsPmieducarUsuario($ref_usuario_exc);
-
-                if (method_exists($tmp_obj, 'existe')) {
-                    if ($tmp_obj->existe()) {
-                        $this->ref_usuario_exc = $ref_usuario_exc;
-                    }
-                } elseif (method_exists($tmp_obj, 'detalhe')) {
-                    if ($tmp_obj->detalhe()) {
-                        $this->ref_usuario_exc = $ref_usuario_exc;
-                    }
-                }
-            } else {
-                if ($db->CampoUnico("SELECT 1 FROM pmieducar.usuario WHERE cod_usuario = '{$ref_usuario_exc}'")) {
                     $this->ref_usuario_exc = $ref_usuario_exc;
-                }
-            }
         }
 
         if (is_numeric($ref_usuario_cad)) {
-            if (class_exists('clsPmieducarUsuario')) {
-                $tmp_obj = new clsPmieducarUsuario($ref_usuario_cad);
-
-                if (method_exists($tmp_obj, 'existe')) {
-                    if ($tmp_obj->existe()) {
-                        $this->ref_usuario_cad = $ref_usuario_cad;
-                    }
-                } elseif (method_exists($tmp_obj, 'detalhe')) {
-                    if ($tmp_obj->detalhe()) {
-                        $this->ref_usuario_cad = $ref_usuario_cad;
-                    }
-                }
-            } else {
-                if ($db->CampoUnico("SELECT 1 FROM pmieducar.usuario WHERE cod_usuario = '{$ref_usuario_cad}'")) {
                     $this->ref_usuario_cad = $ref_usuario_cad;
-                }
-            }
         }
 
         if (is_numeric($ref_cod_reserva_vaga)) {
-            if (class_exists('clsPmieducarReservaVaga')) {
-                $tmp_obj = new clsPmieducarReservaVaga($ref_cod_reserva_vaga);
-
-                if (method_exists($tmp_obj, 'existe')) {
-                    if ($tmp_obj->existe()) {
-                        $this->ref_cod_reserva_vaga = $ref_cod_reserva_vaga;
-                    }
-                } elseif (method_exists($tmp_obj, 'detalhe')) {
-                    if ($tmp_obj->detalhe()) {
-                        $this->ref_cod_reserva_vaga = $ref_cod_reserva_vaga;
-                    }
-                }
-            } else {
-                if ($db->CampoUnico("SELECT 1 FROM pmieducar.reserva_vaga WHERE cod_reserva_vaga = '{$ref_cod_reserva_vaga}'")) {
                     $this->ref_cod_reserva_vaga = $ref_cod_reserva_vaga;
-                }
-            }
         }
 
         if (is_numeric($ref_cod_aluno)) {
-            if (class_exists('clsPmieducarAluno')) {
-                $tmp_obj = new clsPmieducarAluno($ref_cod_aluno);
-
-                if (method_exists($tmp_obj, 'existe')) {
-                    if ($tmp_obj->existe()) {
-                        $this->ref_cod_aluno = $ref_cod_aluno;
-                    }
-                } elseif (method_exists($tmp_obj, 'detalhe')) {
-                    if ($tmp_obj->detalhe()) {
-                        $this->ref_cod_aluno = $ref_cod_aluno;
-                    }
-                }
-            } else {
-                if ($db->CampoUnico("SELECT 1 FROM pmieducar.aluno WHERE cod_aluno = '{$ref_cod_aluno}'")) {
                     $this->ref_cod_aluno = $ref_cod_aluno;
-                }
-            }
         }
 
         if (is_numeric($ref_cod_curso)) {
-            if (class_exists('clsPmieducarCurso')) {
-                $tmp_obj = new clsPmieducarCurso($ref_cod_curso);
-
-                if (method_exists($tmp_obj, 'existe')) {
-                    if ($tmp_obj->existe()) {
-                        $this->ref_cod_curso = $ref_cod_curso;
-                    }
-                } elseif (method_exists($tmp_obj, 'detalhe')) {
-                    if ($tmp_obj->detalhe()) {
-                        $this->ref_cod_curso = $ref_cod_curso;
-                    }
-                }
-            } else {
-                if ($db->CampoUnico("SELECT 1 FROM pmieducar.curso WHERE cod_curso = '{$ref_cod_curso}'")) {
                     $this->ref_cod_curso = $ref_cod_curso;
-                }
-            }
         }
 
         if (is_numeric($cod_matricula)) {
@@ -845,7 +705,7 @@ class clsPmieducarMatricula
         }
 
         if (is_array($arr_int_cod_matricula) && count($arr_int_cod_matricula)) {
-            $filtros .= "{$whereAnd} cod_matricula IN (". implode(',', $arr_int_cod_matricula) . ')';
+            $filtros .= "{$whereAnd} cod_matricula IN (" . implode(',', $arr_int_cod_matricula) . ')';
             $whereAnd = ' AND ';
         }
 
@@ -1106,7 +966,7 @@ class clsPmieducarMatricula
         }
 
         if (is_array($arr_int_cod_matricula) && count($arr_int_cod_matricula)) {
-            $filtros .= "{$whereAnd} cod_matricula IN (". implode(',', $arr_int_cod_matricula) . ')';
+            $filtros .= "{$whereAnd} cod_matricula IN (" . implode(',', $arr_int_cod_matricula) . ')';
             $whereAnd = ' AND ';
         }
 
@@ -1274,7 +1134,7 @@ class clsPmieducarMatricula
                                                AND matricula.ativo = 1");
 
         $sql = $ultimaMatricula == null ? null :
-           "SELECT *
+            "SELECT *
               FROM pmieducar.matricula
              WHERE matricula.ref_cod_aluno = $codAluno
                AND matricula.ativo = 1
@@ -1305,77 +1165,6 @@ class clsPmieducarMatricula
         return $situacaoUltimaMatricula;
     }
 
-    /**
-     * Define quais campos da tabela serão selecionados no método Lista().
-     */
-    public function setCamposLista($str_campos)
-    {
-        $this->_campos_lista = $str_campos;
-    }
-
-    /**
-     * Define que o método Lista() deverpa retornar todos os campos da tabela.
-     */
-    public function resetCamposLista()
-    {
-        $this->_campos_lista = $this->_todos_campos;
-    }
-
-    /**
-     * Define limites de retorno para o método Lista().
-     */
-    public function setLimite($intLimiteQtd, $intLimiteOffset = null)
-    {
-        $this->_limite_quantidade = $intLimiteQtd;
-        $this->_limite_offset = $intLimiteOffset;
-    }
-
-    /**
-     * Retorna a string com o trecho da query responsável pelo limite de
-     * registros retornados/afetados.
-     *
-     * @return string
-     */
-    public function getLimite()
-    {
-        if (is_numeric($this->_limite_quantidade)) {
-            $retorno = " LIMIT {$this->_limite_quantidade}";
-
-            if (is_numeric($this->_limite_offset)) {
-                $retorno .= " OFFSET {$this->_limite_offset} ";
-            }
-
-            return $retorno;
-        }
-
-        return '';
-    }
-
-    /**
-     * Define o campo para ser utilizado como ordenação no método Lista().
-     */
-    public function setOrderby($strNomeCampo)
-    {
-        if (is_string($strNomeCampo) && $strNomeCampo) {
-            $this->_campo_order_by = $strNomeCampo;
-        }
-    }
-
-    /**
-     * Retorna a string com o trecho da query responsável pela Ordenação dos
-     * registros.
-     *
-     * @return string
-     */
-    public function getOrderby()
-    {
-        if (is_string($this->_campo_order_by)) {
-            return " ORDER BY {$this->_campo_order_by} ";
-        }
-
-        return '';
-    }
-
     public function isSequencia($origem, $destino)
     {
         $obj = new clsPmieducarSequenciaSerie();
@@ -1393,7 +1182,7 @@ class clsPmieducarMatricula
                     break;
                 }
 
-                $sequencia_= $obj->lista(
+                $sequencia_ = $obj->lista(
                     $lista['ref_serie_destino'],
                     null,
                     null,
@@ -1503,16 +1292,16 @@ class clsPmieducarMatricula
     }
 
     /**
-    * Seta a matricula para abandono e seta a observação passada por parâmetro
-    *
-    * @author lucassch
-    *
-    * @return boolean
-    */
+     * Seta a matricula para abandono e seta a observação passada por parâmetro
+     *
+     * @return boolean
+     * @author lucassch
+     *
+     */
     public function cadastraObs($obs, $tipoAbandono)
     {
         if (is_numeric($this->cod_matricula)) {
-            if (trim($obs)=='') {
+            if (trim($obs) == '') {
                 $obs = 'Não informado';
             }
 
@@ -1591,7 +1380,7 @@ class clsPmieducarMatricula
                 $observacao = 'Não informado';
             }
 
-            $db  = new clsBanco();
+            $db = new clsBanco();
             $sql = "UPDATE {$this->_tabela}
                        SET saida_escola = true,
                            observacao = '$observacao',
@@ -1778,7 +1567,7 @@ class clsPmieducarMatricula
                      ORDER BY EXTRACT ( YEAR FROM ( age(now(),data_nasc) ) ),
                               f.sexo";
 
-            $db= new clsBanco();
+            $db = new clsBanco();
             $db->Consulta($select);
             $total_registros = $db->Num_Linhas();
 

@@ -36,7 +36,6 @@ class clsIndexBase extends clsBase
     {
         $this->SetTitulo( "{$this->_instituicao} i-Educar - Cliente" );
         $this->processoAp = "603";
-        $this->addEstilo('localizacaoSistema');
     }
 }
 
@@ -167,24 +166,17 @@ class indice extends clsListagem
         {
             foreach ( $lista AS $registro )
             {
-                if ( class_exists( "clsBanco" ) ) {
+                $sql_unico = "SELECT 1
+                                FROM pmieducar.cliente_suspensao
+                               WHERE ref_cod_cliente = {$registro["cod_cliente"]}
+                                 AND data_liberacao IS NULL
+                                 AND EXTRACT ( DAY FROM ( NOW() - data_suspensao ) ) < dias";
+                $suspenso  = $obj_banco->CampoUnico( $sql_unico );
+                if ( is_numeric( $suspenso ) )
+                    $registro["status"] = "Suspenso";
+                else
+                    $registro["status"] = "Regular";
 
-                    $sql_unico = "SELECT 1
-                                    FROM pmieducar.cliente_suspensao
-                                   WHERE ref_cod_cliente = {$registro["cod_cliente"]}
-                                     AND data_liberacao IS NULL
-                                     AND EXTRACT ( DAY FROM ( NOW() - data_suspensao ) ) < dias";
-                    $suspenso  = $obj_banco->CampoUnico( $sql_unico );
-                    if ( is_numeric( $suspenso ) )
-                        $registro["status"] = "Suspenso";
-                    else
-                        $registro["status"] = "Regular";
-                }
-                else {
-                    $registro["ref_idpes"] = "Erro na geracao";
-                    echo "<!--\nErro\nClasse nao existente: clsBanco\n-->";
-                }
-//              echo "<pre>"; print_r($registro); die();
                 $this->addLinhas( array(
                     "<a href=\"educar_cliente_det.php?cod_cliente={$registro["cod_cliente"]}&ref_cod_biblioteca={$registro["cod_biblioteca"]}\">{$registro["cod_cliente"]}</a>",
                     "<a href=\"educar_cliente_det.php?cod_cliente={$registro["cod_cliente"]}&ref_cod_biblioteca={$registro["cod_biblioteca"]}\">{$registro["nome"]}</a>",

@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Employee;
+use App\Models\LegacyInstitution;
+use App\Models\LegacySchoolClass;
+use App\Services\iDiarioService;
 use iEducar\Modules\Educacenso\Model\TipoAtendimentoTurma;
 use iEducar\Modules\Educacenso\Model\TipoMediacaoDidaticoPedagogico;
 use iEducar\Modules\Servidores\Model\FuncaoExercida;
@@ -166,7 +170,7 @@ class indice extends clsCadastro
             'label_hint' => 'Preencha apenas se o servidor atuar em algum turno específico'
         ];
 
-        if ($this->tipoacao === 'Editar') {
+        if ($this->tipoacao === 'Editar' && $this->existeLancamentoIDiario($this->servidor_id, $this->ref_cod_turma)) {
             $options['disabled'] = true;
         }
 
@@ -202,6 +206,10 @@ class indice extends clsCadastro
 
         if ($this->ref_cod_turma) {
             if (!$this->validaCamposCenso()) {
+                return false;
+            }
+
+            if (!$this->validaVinculoEscola()) {
                 return false;
             }
 
@@ -256,6 +264,9 @@ class indice extends clsCadastro
             return false;
         }
 
+        if (!$this->validaVinculoEscola()) {
+            return false;
+        }
 
         if ($professorTurma->existe2()) {
             $this->mensagem .= 'Não é possível cadastrar pois já existe um vínculo com essa turma.<br>';
@@ -304,6 +315,30 @@ class indice extends clsCadastro
         return $this->validaFuncaoExercida();
     }
 
+    public function validaVinculoEscola()
+    {
+        $instituicao = LegacyInstitution::find($this->ref_cod_instituicao);
+
+        if (!$instituicao->bloquear_vinculo_professor_sem_alocacao_escola) {
+            return true;
+        }
+
+        /** @var Employee $servidor */
+        $servidor = Employee::findOrFail($this->servidor_id);
+
+        $vinculoEscola = $servidor->schools()
+            ->where('ref_cod_escola', $this->ref_cod_escola)
+            ->withPivotValue('ano', $this->ano)
+            ->exists();
+
+        if ($vinculoEscola) {
+            return true;
+        }
+
+        $this->mensagem = 'Não é possível cadastrar o vínculo pois o servidor não está alocado na escola selecionada.';
+        return false;
+    }
+
     private function validaFuncaoExercida()
     {
         $obj_turma = new clsPmieducarTurma($this->ref_cod_turma);
@@ -334,6 +369,29 @@ class indice extends clsCadastro
         }
 
         return true;
+    }
+
+    /**
+     * Verifica se existe lançamento no iDiario
+     *
+     * @param integer $professorId
+     * @param integer $turmaId
+     * @return bool
+     */
+    private function existeLancamentoIDiario($professorId, $turmaId)
+    {
+        try {
+            /** @var iDiarioService $iDiarioService */
+            $iDiarioService = app(iDiarioService::class);
+        } catch (RuntimeException $e) {
+            return false;
+        }
+
+        if ($iDiarioService->getTeacherClassroomsActivity($professorId, $turmaId)) {
+            return true;
+        }
+
+        return false;
     }
 }
 

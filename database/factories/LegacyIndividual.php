@@ -3,6 +3,9 @@
 use App\Models\LegacyIndividual;
 use App\Models\LegacyPerson;
 use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
+
+/** @var Factory $factory */
 
 $factory->define(LegacyIndividual::class, function (Faker $faker) {
     return [
@@ -12,6 +15,5 @@ $factory->define(LegacyIndividual::class, function (Faker $faker) {
         'origem_gravacao' => 'U',
         'data_cad' => $faker->dateTime,
         'operacao' => 'I',
-        'idsis_cad' => '17',
     ];
 });

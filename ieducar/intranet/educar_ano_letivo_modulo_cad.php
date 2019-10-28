@@ -19,7 +19,6 @@ class clsIndexBase extends clsBase
     {
         $this->SetTitulo($this->_instituicao . ' Ano Letivo Etapa');
         $this->processoAp = 561;
-        $this->addEstilo('localizacaoSistema');
     }
 }
 
@@ -180,7 +179,6 @@ class indice extends clsCadastro
 
         $opcoesCampoModulo = [];
 
-        if (class_exists('clsPmieducarModulo')) {
             $objTemp = new clsPmieducarModulo();
             $objTemp->setOrderby('nm_tipo ASC');
 
@@ -207,9 +205,6 @@ class indice extends clsCadastro
                     $opcoesCampoModulo[$registro['cod_modulo']] = sprintf('%s - %d etapa(s)', $registro['nm_tipo'], $registro['num_etapas']);
                 }
             }
-        } else {
-            $opcoesCampoModulo = ['' => 'Erro na geração'];
-        }
 
         $this->campoLista(
             'ref_cod_modulo',
@@ -540,6 +535,7 @@ class indice extends clsCadastro
                 'visivel',
                 'turma_turno_id',
                 'tipo_boletim',
+                'tipo_boletim_diferenciado',
                 'ano',
                 'dias_semana',
                 'atividades_complementares',
@@ -562,6 +558,7 @@ class indice extends clsCadastro
             $turmaDestino->ano = $anoDestino;
             $turmaDestino->ref_usuario_cad = $this->pessoa_logada;
             $turmaDestino->ref_usuario_exc = $this->pessoa_logada;
+            $turmaDestino->visivel = dbBool($turmaOrigem['visivel']);
             $turmaDestinoId = $turmaDestino->cadastra();
 
             $this->copiarComponenteCurricularTurma($turmaOrigem['cod_turma'], $turmaDestinoId);

@@ -2,7 +2,9 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-ini_set("max_execution_time", 30000);
+use iEducar\Modules\Educacenso\RunMigrations;
+
+ini_set("max_execution_time", 0);
 /**
  * i-Educar - Sistema de gestão escolar
  *
@@ -53,7 +55,6 @@ class clsIndexBase extends clsBase
   {
     $this->SetTitulo($this->_instituicao . ' i-Educar - Importação educacenso');
     $this->processoAp = 9998849;
-    $this->addEstilo('localizacaoSistema');
   }
 }
 
@@ -157,9 +158,18 @@ class indice extends clsCadastro
       }
       //echo 'Tempo para importar registro '.$numeroRegistro.': ' . (microtime(true) - $time_start) . '<br/>';
     }
+
+    $this->runMigrations();
+
     @header_remove('Set-Cookie');
     $this->mensagem = "Arquivo importado!";
     return true;
+  }
+
+  private function runMigrations()
+  {
+    $runMigrationsService = new RunMigrations();
+    $runMigrationsService->run();
   }
 
   function importaRegistro00($dadosRegistro) {
@@ -320,7 +330,9 @@ class indice extends clsCadastro
     }
 
     $camposEscola = array(
-      'local_funcionamento' => $localFuncionamento,
+      'possui_dependencias' => 0,
+      'local_funcionamento' => (string) $localFuncionamento,
+      'predio_compartilhado_outra_escola' => $dadosRegistro[13-1],
       'condicao' => $dadosRegistro[12-1],
       'codigo_inep_escola_compartilhada' => $dadosRegistro[14-1],
       'agua_consumida' => $dadosRegistro[20-1],
@@ -430,6 +442,9 @@ class indice extends clsCadastro
 
       foreach ($fields as $key => $value) {
         if(property_exists($objEscola, $key)){
+          if ($this->isPostgresArray($value)) {
+            $value = $this->cleanPostgresArray($value);
+          }
           $objEscola->{$key} = $value;
         }
       }
@@ -438,7 +453,20 @@ class indice extends clsCadastro
       }
       $objEscola->edita();
     }
+  }
 
+  private function isPostgresArray($value)
+  {
+    if (substr($value, 0, 1) == '{' && substr($value, -1) == '}') {
+      return true;
+    }
+
+    return false;
+  }
+
+  private function cleanPostgresArray($value)
+  {
+    return str_replace(['{','}'], '', $value);
   }
 
   function importaRegistro20($dadosRegistro){
@@ -549,7 +577,7 @@ class indice extends clsCadastro
         $turma->max_aluno = 99;
         $turma->ativo = 1;
         $turma->multiseriada = 0;
-        $turma->visivel = 1;
+        $turma->visivel = true;
         $turma->ref_cod_turma_tipo = $codTurmaTipo;
         $turma->hora_inicial = $horaInicial;
         $turma->hora_final = $horaFinal;
@@ -1757,6 +1785,9 @@ class indice extends clsCadastro
 
     foreach ($fields as $key => $value){
       if(property_exists($escola, $key)){
+         if ($this->isPostgresArray($value)) {
+           $value = $this->cleanPostgresArray($value);
+         }
         $escola->{$key} = $value;
       }
     }

@@ -1,5 +1,7 @@
 <?php
 
+use iEducar\Modules\EvaluationRules\Models\ParallelRemedialCalculationType;
+
 require_once 'Core/Controller/Page/EditController.php';
 require_once 'RegraAvaliacao/Model/RegraDataMapper.php';
 require_once 'RegraAvaliacao/Model/RegraRecuperacaoDataMapper.php';
@@ -55,6 +57,10 @@ class EditController extends Core_Controller_Page_EditController
             'help' => 'Informe a média necessária para promoção<br />
                 do aluno, aceita até 3 casas decimais. Exemplos: 5,00; 6,725, 6.<br >
                 Desconsidere esse campo caso selecione o tipo de nota "conceitual"'
+        ],
+        'tipoCalculoRecuperacaoParalela' => [
+            'label' => 'Cálculo da média',
+            'help' => 'Determina o cálculo que será utilizado para definir a média da etapa.'
         ],
         'formulaMedia' => [
             'label' => 'Fórmula de cálculo da média',
@@ -266,20 +272,6 @@ class EditController extends Core_Controller_Page_EditController
             : null;
     }
 
-    /**
-     * @see Core_Controller_Page_EditController::_preConstruct()
-     *
-     * @todo Interação com a API está errada. Isso já é feito em _initNovo()
-     *   na superclasse. VER.
-     */
-    protected function _preConstruct()
-    {
-        if (isset($this->getRequest()->id) && 0 < $this->getRequest()->id) {
-            //$this->setEntity($this->getDataMapper()->find($this->getRequest()->id));
-            //$this->_setRecuperacoes($this->getDataMapper()->findRegraRecuperacao($this->getEntity()));
-        }
-    }
-
     protected function _preRender()
     {
         parent::_preRender();
@@ -310,11 +302,6 @@ class EditController extends Core_Controller_Page_EditController
         );
 
         $this->prependOutput($js);
-
-        Portabilis_View_Helper_Application::loadStylesheet(
-            $this,
-            'intranet/styles/localizacaoSistema.css'
-        );
 
         Portabilis_View_Helper_Application::loadJavascript(
             $this,
@@ -717,6 +704,19 @@ class EditController extends Core_Controller_Page_EditController
             $this->_getHelp('mediaRecuperacaoParalela')
         );
 
+        $this->campoLista(
+            'tipoCalculoRecuperacaoParalela',
+            $this->_getLabel('tipoCalculoRecuperacaoParalela'),
+            ParallelRemedialCalculationType::getDescriptiveValues(),
+            $this->getEntity()->get('tipoCalculoRecuperacaoParalela'),
+            '',
+            false,
+            $this->_getHelp('tipoCalculoRecuperacaoParalela'),
+            '',
+            false,
+            false
+        );
+
         // Parte condicional
         if (!$this->getEntity()->isNew()) {
             // Quebra
@@ -885,6 +885,11 @@ class EditController extends Core_Controller_Page_EditController
         //fixup for checkbox
         if (!isset($data['aprovaMediaDisciplina'])) {
             $data['aprovaMediaDisciplina'] = '0';
+        }
+
+        //fixup for checkbox
+        if (!isset($data['calculaMediaRecParalela'])) {
+            $data['calculaMediaRecParalela'] = '0';
         }
 
         if (isset($entity)) {

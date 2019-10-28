@@ -44,7 +44,7 @@
                     <td class="formlttd" valign="top"><span class="form">{{ $schoolClass->vacancies }}</span></td>
                 </tr>
                 <tr id="tr_ano">
-                    <td class="formmdtd" valign="top"><span class="form">Período de enturmação:</span></td>
+                    <td class="formmdtd" valign="top"><span class="form">Calendário letivo:</span></td>
                     <td class="formmdtd" valign="top"><span class="form">{{ $schoolClass->begin_academic_year->format('d/m/Y') }} à {{ $schoolClass->end_academic_year->format('d/m/Y') }}</span></td>
                 </tr>
             </tbody>
@@ -55,24 +55,14 @@
 
         <h3>Alunos matriculados e enturmados</h3>
 
-        @if($success->count() == 1)
-            <div class="alert-success">Foi desenturmado 1 aluno.</div>
-        @elseif($success->count())
-            <div class="alert-success">Foram desenturmados {{ $success->count() }} alunos.</div>
-        @endif
-
-        @if($fails->count() == 1)
-            <div class="alert-error">Não foi possível desenturmar 1 aluno.</div>
-        @elseif($fails->count())
-            <div class="alert-error">Não foi possível desenturmar {{ $fails->count() }} alunos.</div>
-        @endif
-
-        @if($errors->any())
-            <div class="alert-error">{{ $errors->first() }}</div>
-        @endif
-
         <p>
-            <div><span class="text-muted">A data de saída deve ser entre:</span> <strong>{{ $schoolClass->begin_academic_year->format('d/m/Y') }}</strong> e <strong>{{ $schoolClass->end_academic_year->format('d/m/Y') }}</strong> <span class="text-muted">e maior que a data da enturmação do aluno.</span></div>
+            <div>
+                @if($schoolClass->school->institution->allowRegistrationOutAcademicYear)
+                    <span class="text-muted">A data de saída deve ser maior que a data da enturmação do aluno.</span>
+                @else
+                <span class="text-muted">A data de saída deve ser entre:</span> <strong>{{ $schoolClass->begin_academic_year->format('d/m/Y') }}</strong> e <strong>{{ $schoolClass->end_academic_year->format('d/m/Y') }}</strong> <span class="text-muted">e maior que a data da enturmação do aluno.</span>
+                @endif
+            </div>
         </p>
 
         <div class="form-row">

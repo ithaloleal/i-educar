@@ -22,15 +22,15 @@ function ajax( funcaoRetorno )
 			xml = new XMLHttpRequest();
 			xml.args = args;
 			xml.personalCallback = funcaoRetorno;
-			xml.onreadystatechange = function(){ 
-				if( xml.readyState > 3 ) { 
-					if ( xml.status == 200 ) { 
-						xml.personalCallback( xml.responseXML, xml.args ) 
+			xml.onreadystatechange = function(){
+				if( xml.readyState > 3 ) {
+					if ( xml.status == 200 ) {
+						xml.personalCallback( xml.responseXML, xml.args )
 					} else if (xml.status == 500){
 						alert('N\u00e3o existem Componentes curriculares vinculados para a S\u00e9rie/Ano desta escola. Verifique em Cadastros > S\u00e9rie > Escola-s\u00e9rie se os Componentes curriculares foram selecionados/marcados para esta S\u00e9rie/Ano.');
-					}else { 
-						alert('Erro: '+xml.status); 
-					} 
+					}else {
+						alert('Erro: '+xml.status);
+					}
 				} };
 			xml.envia = function(){xml.open("GET",addRandToURL(arguments[0]),true);xml.send(null)};
 			return xml;
@@ -244,11 +244,12 @@ function showExpansivel( largura, altura, conteudo )
 	{
 		titulo = ' &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
 	}
-	var cliqueFecha = '<a href="javascript:void(0);" id="linkFechar" onclick="fechaExpansivel( \'div_dinamico_'+exp_id+'\');" ><img src="/intranet/imagens/moldura/close.png" border="0" width="17" height="17"></a>';
+	var cliqueFecha = '<a href="javascript:void(0);" id="linkFechar" onclick="fechaExpansivel( \'div_dinamico_'+exp_id+'\');" ><img src="/intranet/imagens/close.png" border="0" width="17" height="17"></a>';
 	if (typeof arguments[3] == "number")
 	{
 		cliqueFecha = '';
 	}
+
 	conteudoMoldurado = '<table border="0" id="tabela_conteudo" cellpadding="0" cellspacing="0" width="100%"><tr><td width="9" height="44" valign="top"></td><td id="modal-title" height="44" valign="top">'+ titulo + '</td><td id="modal-close" '+cliqueFecha+'</td><td width="9" height="44" valign="top"></td></tr><tr><td  width="9">&nbsp;</td><td bgcolor="#FFFFFF" colspan="2"><div id="expansivel_conteudo" class="modal-domjs-conteudo" style="overflow:hidden;">';
 	conteudoMoldurado += conteudo;
 	conteudoMoldurado += '</div></td><td width="9">&nbsp;</td></tr><tr><td width="9" height="20" valign="top"></td><td colspan="2"  height="20">&nbsp;</td><td width="9" height="20" valign="top"></td></tr></table>';
@@ -280,7 +281,7 @@ function showExpansivel( largura, altura, conteudo )
 	{
 		expansivel.style.width = expansivel.offsetWidth;
 	}
-	
+
 	centralizaExpansivel();
 }
 
@@ -637,360 +638,6 @@ function DOM_ObjectPosition_getPageOffsetTopLeft( el,type )
 		}
 
 		return offset;
-	}
-}
-
-
-
-
-/*
-
-function DOM_showLinks(e)
-{
-	loadXMLDoc( "teste_xml.php?s=" + atual.searchString );
-}
-
-function DOM_closeLinks()
-{
-	document.getElementById( "expansivel" ).style.display = 'none';
-}
-
-function DOM_focusInLink()
-{
-	DOM_acao = 2;
-	if( DOM_itensArray.length  )
-	{
-		objExpansivel = document.getElementById( "expansivel" );
-		objExpansivel.style.display = 'block';
-		obj = document.getElementById( atual.objectId );
-		posX = ObjectPosition_getPageOffsetLeft( obj );
-		posY = ObjectPosition_getPageOffsetTop( obj );
-		objExpansivel.style.left = posX - 1;
-		objExpansivel.style.top = posY + 12;
-	}
-}
-
-function preencheLink( itensArray )
-{
-	if( itensArray.length )
-	{
-		txt = "<table border=\"0\" cellpading=\"0\" cellspacing=\"0\" style=\"width:100%\">";
-		for( i = 0; i < itensArray.length; i++ )
-		{
-			classe = ( i != opcao )? "DOM_listaNormal": "DOM_listaSelecionado";
-			obj = itensArray[i].firstChild;
-			txt += "<tr><td id=\"linha_" + i + "\" class=\"" + classe + "\" onmouseover=\"DOM_trocaClasse( DOM_opcao, '" + i + "');DOM_opcao=" + i + ";\"><a href=\"\" title=\"" + obj.data + "\" class=\"DOM_multilink\">" + obj.data + "</a></td></tr>\n";
-		}
-		total = i;
-		txt += "</table>";
-
-		objDom = document.getElementById( "expansivel" );
-		objDom.innerHTML = txt;
-		//objDom.style.display = "block";
-		DOM_focusInLink();
-	}
-}
-*/
-
-/*
-	FUNCOES PARA TRATAR O OUTPUT DE UM HTTPREQUEST
-	(personalizado para cada pagina)
-*/
-
-function diaria_carrega_valores()
-{
-	dataPartida = document.getElementById( "data_partida" ).value;
-	horaPartida = document.getElementById( "hora_partida" ).value;
-	dataChegada = document.getElementById( "data_chegada" ).value;
-	horaChegada = document.getElementById( "hora_chegada" ).value;
-
-	tipo_estadual = document.getElementById( "estadual" ).value;
-	tipo_grupo = document.getElementById( "ref_cod_diaria_grupo" ).value;
-
-	// verifica se todos eles estao preenchidos
-	if( dataPartida != "" && horaPartida != "" && dataChegada != "" && horaChegada != "" && tipo_estadual != "" && tipo_grupo != "" )
-	{
-		// define qual a funcao que devera ser executada quando o xml for carregado
-		DOM_execute_when_xmlhttpChange = function() { diaria_trata_valores(); };
-
-		dataPartida = dataPartida.split( "/" ).join( "_" );
-		horaPartida = horaPartida.split( ":" ).join( "_" );
-		dataChegada = dataChegada.split( "/" ).join( "_" );
-		horaChegada = horaChegada.split( ":" ).join( "_" );
-		
-		chegadaDataArr = dataChegada.split( "_" );
-		chegadaCompara = chegadaDataArr[2] + '_' + chegadaDataArr[1] + '_' + chegadaDataArr[0] + '_' + horaChegada;
-		
-		partidaDataArr = dataPartida.split( "_" );
-		partidaCompara = partidaDataArr[2] + '_' + partidaDataArr[1] + '_' + partidaDataArr[0] + '_' + horaPartida;
-
-		if( chegadaCompara > partidaCompara )
-		{
-			if( dataPartida.length == 10 && dataChegada.length == 10 && horaPartida.length == 5 && horaChegada.length == 5 )
-			{
-				document.getElementById( "sug100" ).value = "Carregando...";
-				document.getElementById( "sug75" ).value = "Carregando...";
-				document.getElementById( "sug50" ).value = "Carregando...";
-				document.getElementById( "sug25" ).value = "Carregando...";
-
-				strURL = "xml_diaria_sugestao.php?dp=" + dataPartida + "&hp=" + horaPartida + "&dc=" + dataChegada + "&hc=" + horaChegada + "&grupo=" + tipo_grupo + "&est=" + tipo_estadual;
-				//alert( strURL );
-				DOM_loadXMLDoc( strURL )
-			}
-		}
-		else
-		{
-			alert( 'A data (e hora) de chegada devem ser maiores do que a data (e hora) de saida.' );
-		}
-	}
-}
-
-// Funcao para diaria_cad.php recebe dados do XML e preenche as sugestoes
-function diaria_trata_valores()
-{
-	var valores = [];
-	for( i = 0; i < DOM_itensArray.length; i++ )
-	{
-		objXML = DOM_itensArray[i].firstChild;
-		valores[i] = objXML.data;
-	}
-
-	// preenche os campos de sugestao com os valores do XML
-	document.getElementById( "sug100" ).value = valores[0];
-	document.getElementById( "sug75" ).value = valores[1];
-	document.getElementById( "sug50" ).value = valores[2];
-	document.getElementById( "sug25" ).value = valores[3];
-}
-
-// Funcao para diaria_cad.php recebe dados do XML e preenche as sugestoes
-function diaria_copia_valores()
-{
-	document.getElementById( "vl100" ).value = document.getElementById( "sug100" ).value;
-	document.getElementById( "vl75" ).value = document.getElementById( "sug75" ).value;
-	document.getElementById( "vl50" ).value = document.getElementById( "sug50" ).value;
-	document.getElementById( "vl25" ).value = document.getElementById( "sug25" ).value;
-}
-
-function otopic_qtd_topicos( cod_grupo, cod_reuniao )
-{
-	// define qual a funcao que devera ser executada quando o xml for carregado
-	DOM_execute_when_xmlhttpChange = function() { otopic_recarrega_pagina(); };
-
-	strURL = "xml_otopic_qtdtopicos.php?&cr=" + cod_reuniao;
-	DOM_loadXMLDoc( strURL );
-}
-
-function otopic_recarrega_pagina()
-{
-	var valores = [];
-	for( i = 0; i < DOM_itensArray.length; i++ )
-	{
-		objXML = DOM_itensArray[i].firstChild;
-		valores[i] = objXML.data;
-	}
-
-	// verifica se o numero de topicos eh diferente
-	if( document.getElementById( "qtd_topicos" ).value != valores[0] )
-	{
-		if( confirm( 'Um novo tópico foi inserido para essa reunião. Você gostaia de atualizar a pagina ?' ) )
-		{
-			document.location.href = document.location.href;
-		}
-	}
-	else
-	{
-		//alert( 'mesma qtd ' + valores[0] );
-	}
-}
-
-function odes_renda( )
-{
-	// define qual a funcao que devera ser executada quando o xml for carregado
-	DOM_execute_when_xmlhttpChange = function() { odes_recarrega_pagina(); };
-	numero = document.getElementById('numero').value;
-	idbai = document.getElementById('idbai').value;
-	idlog = document.getElementById('idlog').value;
-	cep = document.getElementById('cep').value;
-	idpes = document.getElementById('cod_pessoa_fj').value;
-	if(numero && idbai && idlog && cep)
-	{
-		strURL = "xml_odes_renda.php?idbai="+idbai+"&idlog="+idlog+"&cep="+cep+"&numero="+numero+"&idpes_atual="+idpes;
-		DOM_loadXMLDoc( strURL );
-	}
-}
-
-
-function atualiza_renda( )
-{
-	/// define qual a funcao que devera ser executada quando o xml for carregado
-	DOM_execute_when_xmlhttpChange = function() { atualiza(); };
-	if(document.getElementById('cod_pessoa_fj'))
-	{
-		var idpes = document.getElementById('cod_pessoa_fj').value;
-		strURL = "xml_odes_renda.php?idpes="+idpes;
-		DOM_loadXMLDoc( strURL );
-	}
-
-}
-
-function atualiza()
-{
-	var valores = [];
-	for( i = 0; i < DOM_itensArray.length; i++ )
-	{
-		objXML = DOM_itensArray[i].firstChild;
-		valores[i] = objXML.data;
-	}
-	var renda_total_outros = parseFloat(valores[0]);
-	var percapta = parseFloat(valores[0])/(parseInt(valores[1])+1);
-	var pessoas = parseInt(valores[1]);
-	var renda_total = 0;
-
-	if(document.getElementById("outras").value != "")
-	{
-		renda_total = parseFloat((document.getElementById("outras").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("aposentadoria").value != "")
-	{
-		renda_total += parseFloat((document.getElementById("aposentadoria").value.replace(".","")).replace(",","."));
-	}
-	if(document.getElementById("total_remuneracao").value != "")
-	{
-		renda_total += parseFloat((document.getElementById("total_remuneracao").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("seguro_desemprego").value != "")
-	{
-		renda_total += parseFloat((document.getElementById("seguro_desemprego").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("pensao").value != "")
-	{
-		renda_total += parseFloat((document.getElementById("pensao").value).replace(".","").replace(",","."));
-	}
-
-	document.getElementById("renda_total_ind").innerHTML = renda_total.toFixed(2);
-	renda_total += renda_total_outros;
-	document.getElementById("renda_total").innerHTML = renda_total.toFixed(2);
-	document.getElementById("renda_percapta").innerHTML = (renda_total/(pessoas+1)).toFixed(2);
-}
-
-
-function atualiza2()
-{
-
-	var pessoas = 0;
-	var renda_total = 0;
-	if(document.getElementById("outras").value != "")
-	{
-		renda_total += Number((document.getElementById("outras").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("aposentadoria").value != "")
-	{
-		renda_total += Number((document.getElementById("aposentadoria").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("total_remuneracao").value != "")
-	{
-		renda_total += Number((document.getElementById("total_remuneracao").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("seguro_desemprego").value != "")
-	{
-		renda_total += Number((document.getElementById("seguro_desemprego").value).replace(".","").replace(",","."));
-	}
-	if(document.getElementById("pensao").value != "")
-	{
-		renda_total += Number((document.getElementById("pensao").value).replace(".","").replace(",","."));
-	}
-
-	document.getElementById("renda_total_ind").innerHTML = renda_total.toFixed(2);
-	document.getElementById("renda_total").innerHTML = renda_total.toFixed(2);
-	document.getElementById("renda_percapta").innerHTML = (renda_total/(pessoas+1)).toFixed(2);
-
-}
-
-// Fun��o para alterar a lista de fila dispon�vel por Institui��o no sistema opencall
-// no menu cadasotro de usu�rio
-
-function callCarregaFila( campo_modificar, campo_atual )
-{
-	// define qual a funcao que devera ser executada quando o xml for carregado
-	DOM_execute_when_xmlhttpChange = function() { callFilaAtendimento( campo_modificar ); };
-	strURL = "xml_call_fila.php?&cod_instituicao=" + document.getElementById(campo_atual).value;
-	DOM_loadXMLDoc( strURL );
-}
-
-
-function callFilaAtendimento(campo_modificar, campo_atual)
-{
-	var valores = [];
-	for( i = 0; i < DOM_itensArray.length; i++ )
-	{
-		objXML = DOM_itensArray[i].firstChild;
-		valores[i] = objXML.data;
-	}
-
-	document.getElementById(campo_modificar).options.length=1;
-	var length = 1;
-	for(i = 0; i< valores.length; i+=2)
-	{
-		document.getElementById(campo_modificar).options[length]= new Option(valores[i+1], valores[i],false,false);
-		length++;
-	}
-
-}
-
-// Fun��o para alterar a quantidade de produtos disponivel
-
-function ce_disponivel( campo_modificar, campo_atual, estoque, valor_soma )
-{
-
-	// define qual a funcao que devera ser executada quando o xml for carregado
-	//DOM_execute_when_xmlhttpChange = function() { ce_atualiza_disponivel( campo_modificar, campo_atual, valor_soma ); };
-
-	var xml1 = new ajax(ce_atualiza_disponivel,campo_modificar,campo_atual,valor_soma);
-	strURL = "xml_ce_disponivel.php?cod_produto=" + document.getElementById(campo_atual).value+"&cod_estoque="+estoque+"&rand="+Math.random()*100000000;
-	xml1.envia(strURL);
-
-	//strURL = "xml_ce_disponivel.php?cod_produto=" + document.getElementById(campo_atual).value+"&cod_estoque="+estoque+"&rand="+Math.random()*100000000;
-	//DOM_loadXMLDoc( strURL );
-}
-
-
-function ce_atualiza_disponivel( objXML )
-{
-	var campo_modificar = arguments[1][0];
-	var campo_atual = arguments[1][1];
-	var valor_soma  = arguments[1][2];
-	
-	var itens = objXML.getElementsByTagName( "item" );
-	
-	var valores = [];
-	for( i = 0; i < itens.length; i++ )
-	{
-		objXML = itens[i].firstChild;
-		valores[i] = objXML.data;
-	}
-//	for(i = 0; i< valores.length; i+=2)
-	for(i = 0; i< valores.length; i++)
-	{
-		//alert(valores[i]);
-		/*var reducao = 0;
-		var cod = document.getElementById(campo_atual).value;
-		if( document.getElementById("quantidade_"+cod) )
-		{
-			reducao =  document.getElementById("quantidade_"+cod).value * 1;
-		}
-
-		document.getElementById(campo_modificar).value = valores[i] - reducao + parseInt(valor_soma);
-		document.getElementById(campo_modificar.replace('[','_[')).value = valores[i] - reducao + parseInt(valor_soma);*/
-		document.getElementById(campo_modificar).value = parseInt(valores[i]) + parseInt(valor_soma);
-		
-		if( document.getElementById(campo_modificar+'_') )
-		{
-			document.getElementById(campo_modificar+'_').value = parseInt(valores[i]) + parseInt(valor_soma);
-		}
-		else
-		{
-			document.getElementById(campo_modificar.replace('[','_[')).value = parseInt(valores[i]) + parseInt(valor_soma);
-		}
 	}
 }
 
@@ -1385,17 +1032,6 @@ function trocaCampo(campo){
 	}
 }
 
-function BuscaEscola(campo){
-	/// define qual a funcao que devera ser executada quando o xml for carregado
-	DOM_execute_when_xmlhttpChange = function() { atualizaEscola(campo); };
-
-	var campo_ = document.getElementById('ref_cod_instituicao');
-	var valor = campo_.options[campo_.selectedIndex].value;
-
-	strURL = "xml_escola.php?cod_instituicao="+valor;
-	DOM_loadXMLDoc( strURL );
-}
-
 function atualizaEscola(campo){
 	document.getElementById(campo).options.length=1;
 	var length = 1;
@@ -1522,7 +1158,7 @@ function getPDFouvidoriaAtendimento()
 	nm_pessoa_at = document.getElementById('nm_pessoa_at').value;
 	cpf_at = document.getElementById('cpf_at').value;
 	nm_pessoa_fin = document.getElementById('nm_pessoa_fin').value;
-	tipo_atividade = document.getElementById('tipo_atividade').value; 
+	tipo_atividade = document.getElementById('tipo_atividade').value;
 	ref_cod_setor = document.getElementById('ref_cod_setor').value;
 	aberto = document.getElementById('aberto').value;
 	descricao_atend = document.getElementById('descricao_atend').value;
@@ -1594,16 +1230,16 @@ function getPDFouvidoriaAtendimentoSetor()
 	logradouro = document.getElementById('logradouro').value;
 	bairro = document.getElementById('bairro').value;
 	ref_cod_setor = document.getElementById('ref_cod_setor').value;
-	
+
 	DOM_execute_when_xmlhttpChange = function() { getPDFouvidoriaAtendimentoSetorDone(); };
-	
+
 	strURL = "xml_ouvidoria_rel_atendimento_setor.php?cod_tipo_servico="+cod_tipo_servico+"&aberto="+aberto+"&cod_atendimento="+cod_atendimento+"&logradouro="+logradouro+"&bairro="+bairro+"&ref_cod_setor="+ref_cod_setor;
-	
+
 	DOM_loadXMLDoc( strURL );
 	Obj = document.getElementById('imprimir');
 	Obj.value = 'Gerando Arquivo...';
 	Obj.onclick = function() { alert('O sistema est?gerando o arquivo. Aguarde!')};
-	
+
 }
 
 function getPDFouvidoriaAtendimentoSetorDone()
@@ -1654,18 +1290,4 @@ function getPDFouvidoriaOrdemDone()
 	Obj.onclick = function() { document.location.href = link;};
 	//alert('Arquivo Conclu?o');
 	document.location.href = link;
-}
-
-function fecha_notificacao( id_notificacao )
-{
-	DOM_execute_when_xmlhttpChange = function()
-	{
-		if( DOM_itensArray[0].firstChild.data == 0 )
-		{
-			alert( 'Erro de permiss?. A notifica?o n? foi deletada.' );
-			document.getElementById('notificacao_' + id_notificacao).style.display='block';
-		}
-	}
-	DOM_loadXMLDoc('deleta_notificacao.php?cod_not=' + id_notificacao);
-	document.getElementById('notificacao_' + id_notificacao).style.display='none';
 }

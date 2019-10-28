@@ -10,7 +10,6 @@ class clsIndex extends clsBase
     {
         $this->SetTitulo("{$this->_instituicao} Vínculo Funcionários!");
         $this->processoAp = '190';
-        $this->addEstilo('localizacaoSistema');
     }
 }
 
@@ -35,7 +34,7 @@ class indice extends clsCadastro
 
         if ($_GET['cod_funcionario_vinculo']) {
             $this->cod_vinculo = $_GET['cod_funcionario_vinculo'];
-            $this->db->Consulta("SELECT nm_vinculo, abreviatura FROM funcionario_vinculo WHERE cod_funcionario_vinculo = $this->cod_vinculo");
+            $this->db->Consulta("SELECT nm_vinculo, abreviatura FROM portal.funcionario_vinculo WHERE cod_funcionario_vinculo = $this->cod_vinculo");
 
             if ($this->db->ProximoRegistro()) {
                 $tupla = $this->db->Tupla();

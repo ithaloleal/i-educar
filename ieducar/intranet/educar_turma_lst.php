@@ -38,7 +38,6 @@ class clsIndexBase extends clsBase
     {
         $this->SetTitulo( "{$this->_instituicao} i-Educar - Turma" );
         $this->processoAp = "586";
-        $this->addEstilo("localizacaoSistema");
     }
 }
 
@@ -191,14 +190,11 @@ class indice extends clsListagem
             $nm_escola = "";
             foreach ( $lista AS $registro )
             {
-                if( class_exists( "clsPmieducarEscola" ) && $registro["ref_ref_cod_escola"] != $ref_cod_escola)
-                {
                     $ref_cod_escola = $registro["ref_ref_cod_escola"];
                     $obj_ref_cod_escola = new clsPmieducarEscola( $registro["ref_ref_cod_escola"] );
                     $det_ref_cod_escola = $obj_ref_cod_escola->detalhe();
                     $ref_cod_escola = $registro["ref_ref_cod_escola"] ;
                     $nm_escola = $det_ref_cod_escola["nome"];
-                }
 
                 $lista_busca = array(
                     "<a href=\"educar_turma_det.php?cod_turma={$registro["cod_turma"]}\">{$registro["ano"]}</a>",

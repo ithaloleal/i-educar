@@ -54,7 +54,6 @@ class clsIndexBase extends clsBase
   {
     $this->SetTitulo($this->_instituicao . ' Servidores - Falta Atraso');
     $this->processoAp = 635;
-    $this->addEstilo("localizacaoSistema");
   }
 }
 
@@ -212,7 +211,7 @@ class indice extends clsCadastro
     }
 
     $this->mensagem = 'Cadastro não realizado.<br />';
-    echo "<!--\nErro ao cadastrar clsPmieducarFaltaAtraso\nvalores obrigatórios\nis_numeric( $this->ref_cod_escola ) && is_numeric($this->ref_ref_cod_instituicao) && is_numeric($this->ref_usuario_exc) && is_numeric($this->ref_usuario_cad) && is_numeric($this->ref_cod_servidor) && is_numeric($this->tipo) && is_string($this->data_falta_atraso) && is_numeric($this->justificada)\n-->";
+
     return FALSE;
   }
 
@@ -251,7 +250,7 @@ class indice extends clsCadastro
     }
 
     $this->mensagem = 'Edição não realizada.<br />';
-    echo "<!--\nErro ao editar clsPmieducarFaltaAtraso\nvalores obrigatórios\nif(is_numeric($this->cod_falta_atraso) && is_numeric($this->ref_usuario_exc))\n-->";
+
     return FALSE;
   }
 
@@ -275,7 +274,7 @@ class indice extends clsCadastro
             $this->ref_cod_servidor, $this->ref_cod_instituicao));
     }
     $this->mensagem = "Exclusão não realizada.<br>";
-    echo "<!--\nErro ao excluir clsPmieducarFaltaAtraso\nvalores obrigatórios\nif( is_numeric( $this->cod_falta_atraso ) && is_numeric( $this->ref_usuario_exc ) )\n-->";
+
     return FALSE;
   }
 }

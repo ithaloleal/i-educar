@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * LegacySchool
@@ -40,6 +42,14 @@ class LegacySchool extends Model
     public $timestamps = false;
 
     /**
+     * @return int
+     */
+    public function getIdAttribute()
+    {
+        return $this->cod_escola;
+    }
+
+    /**
      * Relacionamento com a instituição.
      *
      * @return BelongsTo
@@ -55,5 +65,31 @@ class LegacySchool extends Model
     public function person()
     {
         return $this->belongsTo(LegacyPerson::class, 'ref_idpes');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(
+            LegacyCourse::class,
+            'pmieducar.escola_curso',
+            'ref_cod_escola',
+            'ref_cod_curso'
+        )->withPivot('ativo', 'anos_letivos');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function organization()
+    {
+        return $this->belongsTo(LegacyOrganization::class, 'ref_idpes');
+    }
+
+    public function getNameAttribute()
+    {
+        return DB::selectOne('SELECT relatorio.get_nome_escola(:escola) AS nome', ['escola' => $this->id])->nome;
     }
 }

@@ -89,8 +89,8 @@ class indice
         $temp .= "<center><h3>Acesso negado para este usu&aacute;rio.</h3><br>Caso persista nas tentativas sua conta na intranet poder&aacute; ser bloqueada por tempo indeterminado.</center>";
       }
 
-      $pendencia_administrativa = dbBool($GLOBALS['coreExt']['Config']->app->administrative_pending->exist);
-      $texto_pendencia = $GLOBALS['coreExt']['Config']->app->administrative_pending->msg;
+      $pendencia_administrativa = dbBool(config('legacy.app.administrative_pending.exist'));
+      $texto_pendencia = config('legacy.app.administrative_pending.msg');
 
       if ($pendencia_administrativa)
         echo '
@@ -150,31 +150,6 @@ class indice
 
       $temp_var = 0;
 
-      if (class_exists("clsProcesso")) {
-        // Busca os codigos das pastas ativas
-        $obj_pastas = new clsProcesso();
-        $lista_pastas = $obj_pastas->lista_cod();
-
-        // Verificas se existem pastas ativas
-        if ($lista_pastas) {
-          //Buscas os encaminhamentos da pessoa atual
-          $obj_encaminha = new clsEncaminha();
-          $lista_minhas_pastas = $obj_encaminha->lista_cod_processos(FALSE,
-            FALSE, FALSE, FALSE, FALSE, $id_pessoa, FALSE, FALSE, FALSE,
-            FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, $lista_pastas);
-
-          //Verificas se existem encaminhamentos
-          if ($lista_minhas_pastas) {
-            // Busca os Processos dentro das pastas da pessoa Atual
-            $obj_processo = new clsTramite();
-            $lista_processos_ativos = $obj_processo->lista_cod(FALSE, FALSE,
-              FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-              FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-              FALSE, 1, FALSE, FALSE, FALSE, $lista_minhas_pastas);
-          }
-        }
-      }
-
       // Faz loop da quantidade de dias do MĂÂŞs
       $max_comp_dia = 5;
       for ($i=1; $i <= date('t', mktime(0, 0, 0, $mes, 1, $ano)); $i++) {
@@ -186,92 +161,11 @@ class indice
 
         $compromisso_geral = '';
 
-        if (class_exists('clsEncaminha')) {
-          $objEncaminha = new clsEncaminha();
-          $lista_encaminha = $objEncaminha->lista_cod_encaminha(FALSE, FALSE,
-            FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-            FALSE,$dataAtual, $dataAmanha);
-
-          if($lista_encaminha) {
-            $lista_encaminha = $obj_encaminha->lista(FALSE, FALSE, FALSE, FALSE,
-              FALSE, $id_pessoa, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-              $dataAtual, $dataAmanha, FALSE, FALSE, FALSE, $lista_encaminha);
-          }
-
-          if($lista_encaminha) {
-            foreach ($lista_encaminha as $encaminha) {
-              $id = '';
-
-              if ($encaminha['ref_cod_juris_processo'] &&
-                $encaminha['ref_versao_processo']) {
-
-                $objProcesso = new clsProcesso($encaminha['ref_cod_juris_processo'],
-                  $encaminha['ref_versao_processo']);
-
-                $detalheProcesso = $objProcesso->detalhe();
-
-                if ($detalheProcesso['ativo'] == 1 && !$detalheProcesso['ref_pessoa_finalizadora'] && $qtd < $max_comp_dia ) {
-                  if (! $encaminha['visualizado']) {
-                    $temp_var++;
-                    $endScript .= " x[$temp_var]= $temp_var;";
-                    $id = "id='comp_{$temp_var}'";
-                  }
-
-                  $qtd++;
-                  $compromisso_geral .= "<a href='juris_processo_det.php?cod_processo={$encaminha['ref_cod_juris_processo']}&versao_processo={$encaminha['ref_versao_processo']}' ><span class='textoAgenda' $id>- Pasta nĂÂş {$encaminha['ref_cod_juris_processo']}</span></a><br>";
-                }
-              }
-              else {
-                $objTramite = new clsTramite($encaminha['ref_cod_juris_tramite'],$encaminha['ref_versao_tramite']);
-                $detalheTramite = $objTramite->detalhe();
-                $objProcesso = new clsProcesso($detalheTramite['ref_cod_juris_processo'],$detalheTramite['ref_versao_processo']);
-                $detalheProcesso = $objProcesso->detalhe();
-
-                if ($detalheTramite['ativo'] == 1 &&
-                  !$detalheProcesso['ref_pessoa_finalizadora'] && $qtd< $max_comp_dia) {
-                  if (!$encaminha['visualizado']) {
-                    $temp_var++;
-                    $endScript .= " x[$temp_var]= $temp_var;";
-                    $id = "id='comp_{$temp_var}'";
-                  }
-
-                  $qtd++;
-                  $compromisso_geral .= "<a href='juris_tramite_det.php?cod_tramite={$encaminha['ref_cod_juris_tramite']}&versao_tramite={$encaminha['ref_versao_tramite']}' ><span class='textoAgenda' $id>- Processo nĂÂş {$encaminha['ref_cod_juris_tramite']}</span></a><br>";
-                }
-              }
-            }
-          }
-
-          if ($lista_processos_ativos) {
-            $obj_prazo = new clsJurisTramitePrazo();
-            $lista_prazos = $obj_prazo->lista( FALSE, FALSE, FALSE, FALSE, FALSE,
-              FALSE, FALSE, FALSE,$dataAtual,$dataAmanha, FALSE, FALSE, FALSE,
-              FALSE, $lista_processos_ativos);
-
-            if ($lista_prazos) {
-              foreach ($lista_prazos as $prazo) {
-                if(strlen($prazo['descricao']) > 10) {
-                  $descricao = substr($prazo['descricao'], 0, 10) . '...';
-                }
-                else {
-                  $descricao = $prazo['descricao'];
-                }
-
-                if ($qtd < $max_comp_dia) {
-                  $compromisso_geral .= "<a href='juris_tramite_det.php?cod_tramite={$lista_tramite[0]['cod_juris_tramite']}&versao_tramite={$lista_tramite[0]['versao_tramite']}' ><span class='textoAgenda' $id>- Prazo: {$descricao}</span></a><br>";
-                }
-
-                $qtd++;
-              }
-            }
-          }
-        }
-
         $data_array = explode('/', $dataAtual);
         $data_array = "{$data_array[2]}/{$data_array[1]}/{$data_array[0]}";
 
         $db = new clsBanco();
-        $db->Consulta( "SELECT ref_cod_agenda FROM agenda_responsavel WHERE ref_ref_cod_pessoa_fj = '{$id_pessoa}' AND principal = 1" );
+        $db->Consulta( "SELECT ref_cod_agenda FROM portal.agenda_responsavel WHERE ref_ref_cod_pessoa_fj = '{$id_pessoa}' AND principal = 1" );
 
         if ($db->ProximoRegistro()) {
           list($cod_agenda) = $db->Tupla();

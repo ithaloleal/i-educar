@@ -2,6 +2,9 @@
 
 use App\Models\LegacyPerson;
 use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
+
+/** @var Factory $factory */
 
 $factory->define(LegacyPerson::class, function (Faker $faker) {
     return [
@@ -11,6 +14,5 @@ $factory->define(LegacyPerson::class, function (Faker $faker) {
         'situacao' => $faker->randomElement(['A', 'I', 'P']),
         'origem_gravacao' => $faker->randomElement(['M', 'U', 'C', 'O']),
         'operacao' => $faker->randomElement(['I', 'A', 'E']),
-        'idsis_cad' => 1,
     ];
 });
