@@ -42,6 +42,7 @@ class indice extends clsCadastro
     public $data_saida;
     public $alocacao_array          = [];
     public $alocacao_excluida_array = [];
+    public $setor;
 
     public static $escolasPeriodos = [];
     public static $periodos = [];
@@ -76,6 +77,7 @@ class indice extends clsCadastro
             $this->hora_final                  = $servidorAlocacao['hora_final'];
             $this->hora_atividade              = $servidorAlocacao['hora_atividade'];
             $this->horas_excedentes            = $servidorAlocacao['horas_excedentes'];
+            $this->setor                       = $servidorAlocacao['setor'];
         } elseif (is_numeric($ref_cod_servidor) && is_numeric($ref_ref_cod_instituicao)) {
             $this->ref_ref_cod_instituicao = $ref_ref_cod_instituicao;
             $this->ref_cod_servidor        = $ref_cod_servidor;
@@ -202,6 +204,8 @@ class indice extends clsCadastro
 
         $this->campoLista('ref_cod_funcionario_vinculo', 'V&iacute;nculo', $opcoes, $this->ref_cod_funcionario_vinculo, null, false, '', '', false, false);
 
+        $this->campoTexto('setor', 'Setor', $this->setor);
+
         $this->campoRotulo('informacao_carga_horaria','<b>Informações sobre carga horária</b>');
         $this->campoHora('hora_inicial', 'Hora de início', $this->hora_inicial);
         $this->campoHora('hora_final', 'Hora de término', $this->hora_final);
@@ -239,7 +243,8 @@ class indice extends clsCadastro
             null,
             null,
             $this->ano,
-            $dataAdmissao
+            $dataAdmissao,
+            $this->setor
         );
 
         $carga_horaria_disponivel = $this->hhmmToMinutes($this->carga_horaria_disponivel);
@@ -267,7 +272,8 @@ class indice extends clsCadastro
                 $this->hora_final,
                 $this->hora_atividade,
                 $this->horas_excedentes,
-                $dataSaida
+                $dataSaida,
+                $this->setor
             );
 
             if ($obj_novo->periodoAlocado()) {

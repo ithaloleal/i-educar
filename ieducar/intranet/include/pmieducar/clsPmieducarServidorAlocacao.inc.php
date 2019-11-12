@@ -27,6 +27,7 @@ class clsPmieducarServidorAlocacao extends Model
     public $hora_final;
     public $hora_atividade;
     public $horas_excedentes;
+    public $setor;
 
     /**
      * Carga horária máxima para um período de alocação (em horas).
@@ -84,12 +85,14 @@ class clsPmieducarServidorAlocacao extends Model
         $hora_final = null,
         $hora_atividade = null,
         $horas_excedentes = null,
-        $dataSaida = null
-    ) {
+        $dataSaida = null,
+        $setor = null
+    )
+    {
         $this->_schema = 'pmieducar.';
         $this->_tabela = $this->_schema . 'servidor_alocacao';
 
-        $this->_campos_lista = $this->_todos_campos = 'cod_servidor_alocacao, ref_ref_cod_instituicao, ref_usuario_exc, ref_usuario_cad, ref_cod_escola, ref_cod_servidor, data_cadastro, data_exclusao, ativo, carga_horaria, periodo, ref_cod_servidor_funcao, ref_cod_funcionario_vinculo, ano, data_admissao, hora_inicial, hora_final, hora_atividade, horas_excedentes, data_saida ';
+        $this->_campos_lista = $this->_todos_campos = 'cod_servidor_alocacao, ref_ref_cod_instituicao, ref_usuario_exc, ref_usuario_cad, ref_cod_escola, ref_cod_servidor, data_cadastro, data_exclusao, ativo, carga_horaria, periodo, ref_cod_servidor_funcao, ref_cod_funcionario_vinculo, ano, data_admissao, hora_inicial, hora_final, hora_atividade, horas_excedentes, data_saida, setor ';
 
         if (is_numeric($ref_usuario_cad)) {
             $usuario = new clsPmieducarUsuario($ref_usuario_cad);
@@ -157,7 +160,7 @@ class clsPmieducarServidorAlocacao extends Model
         // Valida a carga horária
         if (is_string($carga_horaria)) {
             $datetime = explode(':', $carga_horaria);
-            $minutos = (((int) $datetime[0]) * 60) + (int) $datetime[1];
+            $minutos = (((int)$datetime[0]) * 60) + (int)$datetime[1];
 
             if (self::$cargaHorariaMax * 60 >= $minutos) {
                 $this->carga_horaria = $carga_horaria;
@@ -194,6 +197,10 @@ class clsPmieducarServidorAlocacao extends Model
 
         if (is_string($dataSaida)) {
             $this->dataSaida = $dataSaida;
+        }
+
+        if ($setor) {
+            $this->setor = $setor;
         }
     }
 
@@ -306,6 +313,12 @@ class clsPmieducarServidorAlocacao extends Model
             if (is_string($this->dataSaida) && !empty($this->dataSaida)) {
                 $campos .= "{$gruda}data_saida";
                 $valores .= "{$gruda}'{$this->dataSaida}'";
+                $gruda = ', ';
+            }
+
+            if (($this->setor)) {
+                $campos .= "{$gruda}setor";
+                $valores .= "{$gruda}'{$this->setor}'";
                 $gruda = ', ';
             }
 
@@ -431,6 +444,11 @@ class clsPmieducarServidorAlocacao extends Model
             $set .= "{$gruda}data_saida = NULL ";
         }
 
+        if (is_string($this->setor)) {
+            $set .= "{$gruda}setor = '{$this->setor}'";
+            $gruda = ', ';
+        }
+
         $db->Consulta("UPDATE {$this->_tabela} SET $set WHERE cod_servidor_alocacao = '{$this->cod_servidor_alocacao}'");
 
         return true;
@@ -460,7 +478,8 @@ class clsPmieducarServidorAlocacao extends Model
         $bool_busca_nome = false,
         $boo_professor = null,
         $ano = null
-    ) {
+    )
+    {
         $filtros = '';
         $whereAnd = ' WHERE ';
 
